@@ -1,0 +1,29 @@
+# 환경변수는 실제 운영 시 .env 파일 또는 CI/CD 환경변수로 관리하는 것이 안전합니다.
+# 아래는 예시입니다.
+services:
+  flow-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=blocker
+      - POSTGRES_PASSWORD=blocker
+      - POSTGRES_DB=db
+    volumes:
+      - ./init.db:/docker-entrypoint-initdb.d
+    restart: always
+
+  flow-backend:
+    build: .
+    container_name: file-extension-blocker
+    depends_on:
+      - flow-db
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://flow-db:5432/db
+      - SPRING_DATASOURCE_USERNAME=blocker
+      - SPRING_DATASOURCE_PASSWORD=blocker
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    restart: on-failure
