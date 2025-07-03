@@ -9,7 +9,6 @@ CREATE TABLE system_settings (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -17,15 +16,6 @@ CREATE TABLE users (
   username VARCHAR(100),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
-);
-
-
-CREATE TABLE user_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  token_hash VARCHAR(255) NOT NULL,
-  expires_at TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE fixed_blocked_extensions (
@@ -42,7 +32,6 @@ CREATE TABLE user_fixed_blocked_extensions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   extension_id UUID REFERENCES fixed_blocked_extensions(id) ON DELETE CASCADE,
-  is_blocked BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   UNIQUE(user_id, extension_id)
@@ -108,8 +97,6 @@ VALUES (
 
 
 CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_user_sessions_token_hash ON user_sessions(token_hash);
-CREATE INDEX idx_user_sessions_expires_at ON user_sessions(expires_at);
 CREATE INDEX idx_user_custom_blocked_extensions_user_id ON user_custom_blocked_extensions(user_id);
 CREATE INDEX idx_user_custom_blocked_extensions_extension ON user_custom_blocked_extensions(extension);
 CREATE INDEX idx_extension_activity_logs_user_id ON extension_activity_logs(user_id);

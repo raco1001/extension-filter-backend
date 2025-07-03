@@ -26,9 +26,6 @@ public class UserFixedBlockedExtension {
     @JoinColumn(name = "extension_id", nullable = false)
     private FixedBlockedExtension extension;
 
-    @Column(nullable = false)
-    private boolean isBlocked;
-
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -39,5 +36,4 @@ public class UserFixedBlockedExtension {
     public void setId(UUID id) { this.id = id; }
     public void setUser(User user) { this.user = user; }
     public void setExtension(FixedBlockedExtension extension) { this.extension = extension; }
-    public void setBlocked(boolean blocked) { this.isBlocked = blocked; }
 } 
