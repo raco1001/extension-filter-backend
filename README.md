@@ -133,7 +133,7 @@ jwt.issuer=flow-extension-blocker
 
 ## 테스트 계정
 
-데이터베이스에 미리 생성된 테스트 계정들:
+데이터베이스에 미리 생성되는 테스트 계정들:
 
 - `1234@example.com` / `1234`
 - `2345@example.com` / `2345`
