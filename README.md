@@ -17,9 +17,87 @@
 - **Gradle**
 - **Java 17**
 
-## docker-comppose를 이용하여 로컬에서 기동했을 때의 API 요청 포트
+## 프로젝트 구조
 
+```https
+.
+├── postman/Flow.postman_collection.json                          # Postman 컬렉션: 로컬 API 테스트시 import 하여 사용할 수 있습니다.
+├── Dockerfile                                                    # 백엔드 컨테이너 빌드를 위한 도커 파일
+├── README.md
+├── docker-compose.yml                                            # 백엔드 + 데이터베이스 구성을 위한 Docker Compose
+├── init.db
+│   └── seed.sql                                                  # docker compose 를 이용한 로컬 개발환경을 구성할 때 사용하는 데이터베이스 초기화 데이터
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── com
+    │   │       └── example
+    │   │           └── flow                                      # 백엔드 어플리케이션
+    │   │               ├── FlowApplication.java
+    │   │               ├── config                                # JWT 인증을 위한 설정
+    │   │               │   ├── JwtAuthenticationFilter.java
+    │   │               │   ├── JwtConfig.java
+    │   │               │   ├── OpenApiConfig.java
+    │   │               │   └── SecurityConfig.java
+    │   │               ├── controller                            # 인증, 확장자 관리 API 컨트롤러
+    │   │               │   ├── AuthController.java
+    │   │               │   └── ExtensionController.java
+    │   │               ├── domain                                # 도메인 모델 (사용자, 시스템 기본 설정 - 요구사항에 명시된 제한 사항을 데이터베이스에 저장된 데이터를 이용하도록 했습니다, 고정 확장자, 유저 별 고정/커스텀 확장자)
+    │   │               │   ├── FixedBlockedExtension.java
+    │   │               │   ├── SystemSetting.java
+    │   │               │   ├── User.java
+    │   │               │   ├── UserCustomBlockedExtension.java
+    │   │               │   ├── UserExtension.java
+    │   │               │   └── UserFixedBlockedExtension.java
+    │   │               ├── dto                                   # 자료형
+    │   │               │   ├── AddCustomExtensionRequest.java
+    │   │               │   ├── AddCustomExtensionResponse.java
+    │   │               │   ├── CustomExtensionDto.java
+    │   │               │   ├── CustomExtensionListResponse.java
+    │   │               │   ├── DeleteCustomExtensionRequest.java
+    │   │               │   ├── DeleteCustomExtensionResponse.java
+    │   │               │   ├── FixedExtensionDto.java
+    │   │               │   ├── LoginRequest.java
+    │   │               │   ├── LoginResponse.java
+    │   │               │   ├── UpdateFixedExtensionRequest.java
+    │   │               │   ├── UpdateFixedExtensionResponse.java
+    │   │               │   └── UserExtensionsResponse.java
+    │   │               ├── exception                              # 전역 예외 처리
+    │   │               │   └── GlobalExceptionHandler.java
+    │   │               ├── repository
+    │   │               │   ├── FixedBlockedExtensionRepository.java
+    │   │               │   ├── SystemSettingRepository.java
+    │   │               │   ├── UserCustomBlockedExtensionRepository.java
+    │   │               │   ├── UserExtensionsRepository.java
+    │   │               │   ├── UserFixedBlockedExtensionRepository.java
+    │   │               │   └── UserRepository.java
+    │   │               ├── service                                # 비즈니스 로직
+    │   │               │   ├── AuthService.java
+    │   │               │   └── ExtensionService.java
+    │   │               └── util
+    │   │                   └── JwtUtil.java
+...
+```
+
+## 로컬 실행
+
+```bash
+docker compose up --build -d
+```
+
+## 통신
+
+### API 주소
+
+```http
 localhost:8080, 127.0.0.1:8080
+```
+
+### Swagger UI
+
+```http
+http://localhost:8080/swagger-ui/index.html
+```
 
 ## API 엔드포인트
 
@@ -31,15 +109,13 @@ localhost:8080, 127.0.0.1:8080
 POST /api/auth/login
 Content-Type: application/json
 
+request body
 {
   "email": "1234@example.com",
   "password": "1234"
 }
-```
 
-응답:
-
-```json
+response body
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
   "userId": "uuid",
@@ -59,31 +135,52 @@ Authorization: Bearer {token}
 
 모든 확장자 API는 JWT 토큰이 필요합니다.
 
-#### 고정 확장자 목록 조회
+#### 모든 확장자 목록 조회
 
 ```http
-GET /api/extensions/fixed
+GET /api/extensions
 Authorization: Bearer {token}
+
+response body
+
+{
+    "fixed": [
+        {
+            "id": "0ab8af46-824c-4362-9b18-49636631729c",
+            "extension": "bat",
+            "displayName": "Batch File",
+            "blocked": false
+        },....
+    ],
+    "custom": [
+        {
+            "id": "22bc5119-bd8e-4d6a-8c12-5f895cc24a0b",
+            "extension": "3456-1"
+        },....
+    ]
+}
+
 ```
 
 #### 고정 확장자 설정 변경
 
 ```http
-POST /api/extensions/fixed
+POST /api/extensions/fixed/:{fixed.id}
 Authorization: Bearer {token}
 Content-Type: application/json
 
+#request body
+
 {
-  "extension": "exe",
   "blocked": true
 }
-```
 
-#### 커스텀 확장자 목록 조회
+#response body
 
-```http
-GET /api/extensions/custom
-Authorization: Bearer {token}
+{
+    "changed": true,
+    "blocked": true
+}
 ```
 
 #### 커스텀 확장자 추가
@@ -93,30 +190,27 @@ POST /api/extensions/custom
 Authorization: Bearer {token}
 Content-Type: application/json
 
+#request body
+
 {
   "extension": "xyz"
+}
+
+#response body
+
+{
+    "success": true,
+    "id": "68cadab6-b1ad-44be-8940-1725bf8d8f72",
+    "extension": "1234-5",
+    "message": "추가 완료"
 }
 ```
 
 #### 커스텀 확장자 삭제
 
 ```http
-DELETE /api/extensions/custom/{extension}
+DELETE /api/extensions/custom/{extensionId}
 Authorization: Bearer {token}
-```
-
-## 로컬 실행 방법
-
-### 1. gradle 빌드
-
-```bash
-./gradlew build
-```
-
-### 2. docker compose 실행
-
-```bash
-docker-compose up --build -d
 ```
 
 ## 설정

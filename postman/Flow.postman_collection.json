@@ -1,0 +1,239 @@
+{
+	"info": {
+		"_postman_id": "c7815eab-b1db-43ec-894c-c44fe807a4c1",
+		"name": "Flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46332209"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();\r",
+									"pm.environment.set(\"authToken\", res.token);\r",
+									"var responseJSON = pm.response.json();\r",
+									"\r",
+									"// Test the response status code and body\r",
+									"pm.test(\"Response status code is 200 and body is not empty\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.expect(responseJSON).to.not.be.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4ODhlOWIyYi0wNWI3LTRkNjItYmY4NS1iMWMxMjdmZjUwNTMiLCJlbWFpbCI6IjEyMzRAZXhhbXBsZS5jb20iLCJpc3MiOiJmbG93LWV4dGVuc2lvbi1ibG9ja2VyIiwiaWF0IjoxNzUxNTM1Njc4LCJleHAiOjE3NTE2MjIwNzh9.MhcBQwOxZ0u8eXrSqQi19niSJncy8ZqSbNUgMW3xV0s",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"3456@example.com\",\r\n  \"password\": \"3456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/auth/logout",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "extensions",
+			"item": [
+				{
+					"name": "fixed",
+					"item": [
+						{
+							"name": "update fixed",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"blocked\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/extensions/fixed/3235cfa4-34eb-46b2-a9e9-1c728b19a57a",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"extensions",
+										"fixed",
+										"3235cfa4-34eb-46b2-a9e9-1c728b19a57a"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "custom",
+					"item": [
+						{
+							"name": "add custom",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"extension\":\"1234-5\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/extensions/custom",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"extensions",
+										"custom"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete custom",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/extensions/custom/2678528e-9858-433c-a296-8928fa5797a0",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"extensions",
+										"custom",
+										"2678528e-9858-433c-a296-8928fa5797a0"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "all",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/extensions",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"extensions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
