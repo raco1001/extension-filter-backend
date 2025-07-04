@@ -27,9 +27,15 @@ docker compose up --build -d
 
 ### API 주소
 
+#### 로컬 환경
+
 ```http
 localhost:8080, 127.0.0.1:8080
 ```
+
+#### 운영 환경
+
+- 개발 과제의 댓글에서 확인 부탁드립니다.
 
 ### Swagger UI
 
