@@ -45,15 +45,6 @@ CREATE TABLE user_custom_blocked_extensions (
   UNIQUE(user_id, extension)
 );
 
-CREATE TABLE extension_activity_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  extension VARCHAR(20) NOT NULL,
-  source_type VARCHAR(20) NOT NULL,
-  action VARCHAR(20) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 
 INSERT INTO fixed_blocked_extensions (extension, display_name, is_blocked) VALUES
 ('bat', 'Batch File', false),
@@ -99,8 +90,6 @@ VALUES (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_user_custom_blocked_extensions_user_id ON user_custom_blocked_extensions(user_id);
 CREATE INDEX idx_user_custom_blocked_extensions_extension ON user_custom_blocked_extensions(extension);
-CREATE INDEX idx_extension_activity_logs_user_id ON extension_activity_logs(user_id);
-CREATE INDEX idx_extension_activity_logs_extension ON extension_activity_logs(extension);
 
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
